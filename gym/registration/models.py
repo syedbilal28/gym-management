@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
-from django.db.models.signals import post_init, post_save, pre_save
+from django.db.models.signals import post_save
+
 # Create your models here.
 class Service(models.Model):
     name=models.CharField(max_length=100,unique=True)
@@ -11,8 +12,9 @@ class Service(models.Model):
         return self.name
     class Meta:
         ordering=("price",)
-class Profile(models.Model):
-    user=models.OneToOneField(User,on_delete=models.CASCADE)
+class Member(models.Model):
+    identity=models.CharField(max_length=10,null=True)
+    name=models.CharField(max_length=256)
     cnic=models.CharField(max_length=15,null=True,blank=True)
     phone=models.CharField(max_length=11,null=True,blank=True)
     fingerprint=models.CharField(max_length=100,null=True,blank=True)    
@@ -20,10 +22,14 @@ class Profile(models.Model):
     discount=models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user.username
-    
+        return self.name
+@receiver(post_save,sender=Member)
+def MemberIdHandler(sender,instance,created, **kwargs):
+    if created:
+        instance.identity=f"FP{instance.id:04d}"
+        instance.save()
 class Attendance(models.Model):
-    user=models.ForeignKey(Profile,on_delete=models.CASCADE)
+    user=models.ForeignKey(Member,on_delete=models.CASCADE)
     timestamp=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

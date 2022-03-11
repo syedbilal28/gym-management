@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "links.html" %}
+    <title>Fitness Planet</title>
+    <style>
+        body{
+            font-family: 'Montserrat', sans-serif;
+        }
+        .function{
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Payment</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <input type="text" placeholder="Search..." id="search">
+              <table class="table my-2">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">CNIC</th>
+                    <th scope="col">Phone</th>
+                    
+                  </tr>
+                </thead>
+                <tbody class="tbody">
+                  
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!--Signup Modal -->
+<div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Become a Member</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/signup/" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                  <label for="">Name</label>
+                  {{ form.name }}
+              </div>
+              <div class="form-group">
+                <label for="">CNIC</label>
+                {{ form.cnic }}
+            </div>
+            <div class="form-group">
+                <label for="">Phone</label>
+                {{ form.phone }}
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-8">
+                        <label for="">Package</label>
+                        {{ form.package }}
+                    </div>
+                    <div class="col-4">
+                        
+                        <p id="price" class="pt-5 fw-bold"></p>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="form-group">
+                
+                {{ form.fingerprint }}
+            </div>
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+    <nav class="navbar navbar-dark bg-dark m-0">
+        <a class="navbar-brand" href="#">Fitness Planet</a>
+      </nav>
+    <div class="container">
+        <div class="top-row py-2 px-5">
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="function rounded p-5 mx-2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#signupModal">
+                    <h2>Admission</h2>
+                </div>
+                <div class="function rounded p-5 mx-2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#paymentModal">
+                    <h2>Payment</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $("input").addClass("form-control")
+    $("select").addClass("form-control")
+    // document.querySelector("#id_fingerprint").type="hidden"
+    $("#id_package").on("change",function(e){
+        var val = $('#id_package option:selected').val();
+        $.ajax({
+            "url":`/package/${val}`,
+            success:function(data){
+                document.querySelector("#price").innerText=`RS.${data.price}`
+            }
+        })
+    })
+    $("#search").on("keyup",function(e){
+        $.ajax({
+            "url":`/search/${e.target.value}/`,
+            success:function(data){
+                var tbody=document.querySelector(".tbody")
+                tbody.innerHTML=""
+                l=data.length
+                final_html=""
+                for (i=0; i<l; i++){
+                    temp=`<tr>
+                            <td>${data[i].identity}</td>
+                            <td>${data[i].name}</td>
+                            <td>${data[i].cnic}</td>
+                            <td>${data[i].phone}</td>
+                        </tr>`
+                    final_html+=temp
+                }
+                tbody.innerHTML=final_html
+            }
+        })
+    })
+</script>
+</html>
