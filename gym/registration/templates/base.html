@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "links.html" %}
+    <title>Fitness Planet</title>
+    <style>
+        body{
+            font-family: 'Montserrat', sans-serif;
+        }
+        .function{
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    {% include "modals.html" %}
+    
+    <nav class="navbar navbar-dark bg-dark m-0">
+        <a class="navbar-brand" href="#">Fitness Planet</a>
+      </nav>
+    <div class="container">
+        <div class="top-row py-2 px-5">
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="function rounded p-5 mx-2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#signupModal">
+                    <h2>Admission</h2>
+                </div>
+                <div class="function rounded p-5 mx-2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#paymentModal">
+                    <h2>Payment</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $("input").addClass("form-control")
+    $("select").addClass("form-control")
+    // document.querySelector("#id_fingerprint").type="hidden"
+    $("#id_package").on("change",function(e){
+        var val = $('#id_package option:selected').val();
+        $.ajax({
+            "url":`/package/${val}`,
+            success:function(data){
+                document.querySelector("#price").innerText=`RS.${data.price}`
+            }
+        })
+    })
+    $("#search").on("keyup",function(e){
+        $.ajax({
+            "url":`/search/${e.target.value}/`,
+            success:function(data){
+                var tbody=document.querySelector(".tbody")
+                tbody.innerHTML=""
+                l=data.length
+                final_html=""
+                for (i=0; i<l; i++){
+                    temp=`<tr>
+                            <td>${data[i].identity}</td>
+                            <td>${data[i].name}</td>
+                            <td>${data[i].cnic}</td>
+                            <td>${data[i].phone}</td>
+                        </tr>`
+                    final_html+=temp
+                }
+                tbody.innerHTML=final_html
+            }
+        })
+    })
+</script>
+</html>

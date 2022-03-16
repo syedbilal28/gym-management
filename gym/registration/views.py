@@ -1,9 +1,8 @@
 from django.http import JsonResponse
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
-
 from .serializers import MemberSerializer
-from .models import Service,Member
+from .models import Service,Member,Payment
 from .forms import MemberShipForm
 from django.db.models import Q
 # Create your views here.
@@ -29,4 +28,6 @@ def Search(request,keyword):
 
 def Ledger(request,member_id):
     member=Member.objects.get(pk=member_id)
-    
+    payments= Payment.objects.filter(user=member)
+    context={"member":member,"payments":payments}
+    return render(request,"ledger.html",context)
